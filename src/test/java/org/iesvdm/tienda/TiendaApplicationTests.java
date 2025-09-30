@@ -4,9 +4,12 @@ import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
 import org.iesvdm.tienda.repository.ProductoRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.Assert;
+
 import java.util.List;
 
 
@@ -47,7 +50,14 @@ class TiendaApplicationTests {
 	@Test
 	void test1() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		
+		var listNomPrec = listProds.stream()
+				.map((s)->"Nombre: "+ s.getNombre() + " Precio: " + s.getPrecio())
+				.toList();
+		listNomPrec.forEach(x->System.out.println(x));
+
+		Assertions.assertEquals(11, listNomPrec.size());
+		Assertions.assertTrue(listNomPrec.contains("Nombre: Disco duro SATA3 1TB Precio: 86.99"));
 	}
 	
 	
