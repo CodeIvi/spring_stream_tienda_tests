@@ -177,6 +177,8 @@ class TiendaApplicationTests {
 					.map(producto->producto.getNombre()+" "+ producto.getPrecio())
 					.toList();
 		nomAs.forEach(System.out::println);
+
+        Assertions.assertEquals(11,nomAs.size());
 		
 	}
 	/**
@@ -324,7 +326,11 @@ class TiendaApplicationTests {
 		setFabs.add(3);
 		setFabs.add(5);
 
-		listProds.stream().filter(producto->setFabs.contains(producto.getFabricante().getCodigo())).toList();
+        var filtrados = listProds.stream().filter(producto->setFabs.contains(producto.getFabricante().getCodigo()))
+						.map(x->"Producto: "+x.getNombre())
+                                .toList();
+        filtrados.forEach(x->System.out.println(x));
+
 	}
 	
 	/**
@@ -333,7 +339,12 @@ class TiendaApplicationTests {
 	@Test
 	void test18() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+        var ProdCent = listProds.stream()
+                .map(x->"Nombre: "+x.getNombre()+ " "+"Precio: "+(x.getPrecio()*100) + " Céntimos")
+                .toList();
+        ProdCent.forEach(x->System.out.println(x));
+
 	}
 	
 	
@@ -343,7 +354,12 @@ class TiendaApplicationTests {
 	@Test
 	void test19() {
 		var listFabs = fabRepo.findAll();
-		//TODOS
+
+        var nombS= listFabs.stream()
+                .filter(x->x.getNombre().substring(0,1).equalsIgnoreCase("s"))
+                .map(x->"Nombre: "+x.getNombre())
+                .toList();
+        nombS.forEach(x->System.out.println(x));
 	}
 	
 	/**
@@ -351,27 +367,43 @@ class TiendaApplicationTests {
 	 */
 	@Test
 	void test20() {
-		var listProds = prodRepo.findAll();
-		//TODO
-	}
-	
+        var listProds = prodRepo.findAll();
+
+        var cadPortatil = listProds.stream()
+                .filter(x -> x.getNombre().contains("Portátil"))
+                .map(x -> "Nombre: " + x.getNombre())
+                .toList();
+        cadPortatil.forEach(x -> System.out.println(x));
+    }
 	/**
 	 * 21. Devuelve una lista con el nombre de todos los productos que contienen la cadena Monitor en el nombre y tienen un precio inferior a 215 €.
 	 */
 	@Test
 	void test21() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var monPre = listProds.stream()
+                .filter(x->x.getNombre().contains("Monitor") && x.getPrecio()<215)
+                .map(x->"Nombre: "+x.getNombre())
+                .toList();
+        monPre.forEach(x->System.out.println(x));
 	}
 	
 	/**
 	 * 22. Lista el nombre y el precio de todos los productos que tengan un precio mayor o igual a 180€. 
 	 * Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre (en orden ascendente).
 	 */
+    @Test
 	void test22() {
 		var listProds = prodRepo.findAll();
-		//TODO
-	}
+
+        var nomPre = listProds.stream()
+                .filter(x->x.getPrecio()>= 180)
+                .sorted(comparing((Producto producto)->producto.getPrecio())
+                        .thenComparing((Producto producto)->producto.getNombre(),reverseOrder()))
+                .map(x->"Nombre: "+x.getNombre())
+                .toList();
+        nomPre.forEach(x->System.out.println(x));
+    }
 	
 	/**
 	 * 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos. 
@@ -380,7 +412,13 @@ class TiendaApplicationTests {
 	@Test
 	void test23() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+        var list = listProds.stream()
+                .sorted(comparing((Producto producto)->producto.getFabricante().getNombre()))
+                .map(x->"Nombre: "+x.getNombre()+ " "+"Precio: "+ x.getPrecio()+ " " +"Fabricante: "+ x.getFabricante().getNombre())
+
+                .toList();
+        list.forEach(x->System.out.println(x));
 	}
 	
 	/**
@@ -389,8 +427,14 @@ class TiendaApplicationTests {
 	@Test
 	void test24() {
 		var listProds = prodRepo.findAll();
-		//TODO
-	}
+
+        var prodCaro = listProds.stream()
+                .sorted(comparing(producto -> producto.getPrecio(),reverseOrder()))
+                .limit(1)
+                .map(x->"Nombre: "+x.getNombre()+" "+"Precio: "+x.getPrecio()+" "+"Fabricante: "+ x.getFabricante().getNombre());
+
+        prodCaro.forEach(x->System.out.println(x));
+    }
 	
 	/**
 	 * 25. Devuelve una lista de todos los productos del fabricante Crucial que tengan un precio mayor que 200€.
@@ -398,7 +442,14 @@ class TiendaApplicationTests {
 	@Test
 	void test25() {
 		var listProds = prodRepo.findAll();
-		//TODO	
+
+        var crucial = listProds.stream()
+                .filter(x->x.getFabricante().getNombre().contains("Crucial") && x.getPrecio()>200)
+                .map(x->"Nombre: "+x.getNombre()+" "+x.getPrecio())
+                .toList();
+        crucial.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(1,crucial.size());
 	}
 	
 	/**
@@ -407,8 +458,15 @@ class TiendaApplicationTests {
 	@Test
 	void test26() {
 		var listProds = prodRepo.findAll();
-		//TODO
-	}
+        Set<String> fabricante = new HashSet<>();
+		var filtrar = listProds.stream()
+                .filter(x->x.getFabricante().getNombre().equalsIgnoreCase("Asus")||
+                        x.getFabricante().getNombre().equalsIgnoreCase("Hewlett-Packard") ||
+                        x.getFabricante().getNombre().equalsIgnoreCase("Seagate"))
+                .map(x->"Nombre: "+x.getNombre()+" "+"Fabricante: "+x.getFabricante().getNombre())
+                .toList();
+        filtrar.forEach(x->System.out.println(x));
+    }
 	
 	/**
 	 * 27. Devuelve un listado con el nombre de producto, precio y nombre de fabricante, de todos los productos que tengan un precio mayor o igual a 180€. 
