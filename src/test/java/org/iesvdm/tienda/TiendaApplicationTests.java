@@ -16,10 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import static java.util.Comparator.*;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @SpringBootTest
@@ -485,7 +482,16 @@ Monitor 27 LED Full HD |199.25190000000003|Asus
 	@Test
 	void test27() {
 		var listProds = prodRepo.findAll();
-		//TODO
+        System.out.println("Producto             Precio                Fabricante");
+        System.out.println("------------------------------------------------------");
+		var list = listProds.stream()
+                .filter(x->x.getPrecio()>=180)
+                .sorted(comparing((Producto producto)->producto.getPrecio(),reverseOrder())
+                        .thenComparing((Producto producto)->producto.getNombre()))
+                .map(x->x.getNombre() + "|" + x.getPrecio() + "|" + x.getFabricante().getNombre())
+                .toList();
+        list.forEach(s->System.out.println(s));
+
 	}
 	
 	/**
@@ -737,5 +743,105 @@ Hewlett-Packard              2
 		var listFabs = fabRepo.findAll();
 		//TODO
 	}
+    @Test
+    void testFlatmapPrevio() {
+
+
+        String[] words = new String[]{ "Hello", "World" };
+
+        List<String[]> list = Arrays.stream(words)
+                .map(word -> word.split(""))
+
+                .peek(strings -> {
+                            System.out.println(strings);
+
+                            System.out.println(Arrays.toString(strings));
+
+                        }
+                )
+
+                //Aplica a cada palabra del array, pero word.split devuelve un array de String, de modo que
+                // map ha transformado el flujo de Stream<String> a Stream<String[]>
+                .distinct()
+                .toList();
+
+
+    }
+
+    @Test
+    void testFlatmapAlternativaMap() {
+
+
+        String[] words = new String[]{ "Hello", "World" };
+
+        var list = Arrays.stream(words)
+                .map(word -> word.split(""))
+                .map( strings -> Arrays.stream(strings))
+
+                .peek(strings -> {
+                            System.out.println(strings);
+
+                            //System.out.println(Arrays.toString(strings));
+
+                        }
+                )
+
+
+                //Aplica a cada palabra del array, pero word.split devuelve un array de String, de modo que
+                // map ha transformado el flujo de Stream<String> a Stream<String[]>
+                .distinct()
+                .toList();
+
+
+    }
+
+    @Test
+    void testFlatmapSolucion() {
+
+
+        String[] words = new String[]{ "Hello", "World" };
+
+        var list = Arrays.stream(words)
+                .map(word -> word.split(""))
+                .flatMap( strings -> Arrays.stream(strings))
+
+                //.peek(strings ->   System.out.println(strings) )
+
+
+                //Aplica a cada palabra del array, pero word.split devuelve un array de String, de modo que
+                // map ha transformado el flujo de Stream<String> a Stream<String[]>
+                .distinct()
+                .peek(strings ->   System.out.println(strings) )
+                .toList();
+
+
+    }
+
+    @Test
+    void testMatch() {
+
+
+        String[] words = new String[]{ "Hello", "World" };
+
+        Assertions.assertTrue(Arrays.stream(words)
+                .map(word -> word.split(""))
+                .flatMap( strings -> Arrays.stream(strings))
+                .distinct()
+                .anyMatch(s -> "l".equals(s)));
+
+        Assertions.assertTrue(Arrays.stream(words)
+                .map(word -> word.split(""))
+                .flatMap( strings -> Arrays.stream(strings))
+                .distinct()
+                .noneMatch(s -> "z".equals(s)));
+
+        Assertions.assertTrue(Arrays.stream(words)
+                .map(word -> word.split(""))
+                .flatMap( strings -> Arrays.stream(strings))
+                .distinct()
+                .allMatch(s -> s.length() == 1));
+
+    }
+
 
 }
