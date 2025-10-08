@@ -620,7 +620,7 @@ Fabricante: Xiaomi
 	
 	/**
 	 * 36. Calcula la media del precio de todos los productos del fabricante Asus.
-	 */
+	 l*/
 	@Test
 	void test36() {
 		var listProds = prodRepo.findAll();
