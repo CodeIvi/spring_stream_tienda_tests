@@ -17,6 +17,8 @@ import java.math.RoundingMode;
 import static java.util.Comparator.*;
 
 import java.util.*;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 @SpringBootTest
@@ -587,9 +589,11 @@ Fabricante: Xiaomi
 	void test31() {
 		var listProds = prodRepo.findAll();
 		var cantFab =  listProds.stream()
-                .filter(x->x.getFabricante().getProductos().size()>0)
-                .count();
+                .mapToInt(x->x.getFabricante().getCodigo())
+                .max();
         System.out.println("Hay "+cantFab+" fabricantes con productos");
+
+        Assertions.assertEquals(7,cantFab);
 	}
 	
 	/**
@@ -598,7 +602,11 @@ Fabricante: Xiaomi
 	@Test
 	void test32() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var media = listProds.stream()
+                .mapToDouble(x->x.getPrecio())
+                .average();
+        System.out.println(media);
+        Assertions.assertEquals(2988.96,media);
 	}
 	
 	/**
@@ -607,7 +615,11 @@ Fabricante: Xiaomi
 	@Test
 	void test33() {
 		var listProds = prodRepo.findAll();
-		//TODO
+        var precMasBarato = listProds.stream()
+                .mapToDouble(x->x.getPrecio())
+                .min();
+        System.out.println(precMasBarato);
+
 	}
 	
 	/**
@@ -616,7 +628,7 @@ Fabricante: Xiaomi
 	@Test
 	void test34() {
 		var listProds = prodRepo.findAll();
-		//TODO	
+        var
 	}
 	
 	/**
@@ -645,7 +657,43 @@ Fabricante: Xiaomi
 	@Test
 	void test37() {
 		var listProds = prodRepo.findAll();
-		//TODO
+            var summaryStatistics = listProds.stream()
+                    .filter(producto -> producto.getFabricante().getNombre().equals("Crucial"))
+                    .mapToDouble(p->p.getPrecio())
+                    .summaryStatistics();
+
+
+            double [] reduced = listProds.stream()
+                .filter(producto -> producto.getFabricante().getNombre().equals("Crucial"))
+                .map(p -> new double[]{p.getPrecio(),p.getPrecio(),p.getPrecio(),0})
+                        .reduce(new double[]{0.0/*min*/,0.0/*max*/,0.0/*sum*/,0.0/*count*/}, (double[] a,double[]b)->{
+                            double minAct = 0.0;
+                            double maxAct = 0.0;
+                            double sumAct = 0.0;
+                            double countAct= 0.0;
+
+
+                            double minAnt = (Double) a[0];
+                            if((Double)b[0]<minAnt){
+                                minAct = (Double)b[0];
+                            }else{
+                                minAct = minAnt;
+                            }
+                            double maxAnt = (Double) a[1];
+                            if((Double)b[1]>maxAnt){
+                                maxAct = (Double)b[1];
+                            }
+
+                            double sumAnt = (Double) a[2];
+                            sumAct = sumAnt + b[2];
+
+                            double countAnt = (Double) a[3];
+                            countAct = countAnt + 1;
+
+                            return new double[]{minAct,maxAct,sumAct,countAnt};
+        });
+
+        System.out.println(Arrays.toString(reduced));
 	}
 	
 	/**
@@ -850,6 +898,15 @@ Hewlett-Packard              2
                 .flatMap( strings -> Arrays.stream(strings))
                 .distinct()
                 .allMatch(s -> s.length() == 1));
+
+    }
+
+    @Test
+    void testReduce(){
+        int sumTotal = IntStream.iterate(1,i->i<100,i->i+2)
+                .peek(value->System.out.println(value))
+                .reduce(0,(a,b)->a+b);
+        System.out.println(sumTotal);
 
     }
 
