@@ -47,7 +47,7 @@ class TiendaApplicationTests {
 			p.getFabricante().getProductos().forEach(pF -> System.out.println(">>>>"+pF));
 		});
 				
-	}
+        }
 
 	
 	/**
