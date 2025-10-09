@@ -12,7 +12,7 @@
 -- 5. Lista el código de los fabricantes que tienen productos.
     Select distinct f.codigo from fabricante f
     inner join producto p
-on f.codigo = p.codigo_fabricante;
+    on f.codigo = p.codigo_fabricante;
 
 -- 6. Lista los nombres de los fabricantes ordenados de forma descendente.
     Select p.nombre from fabricante p order by p.nombre desc;

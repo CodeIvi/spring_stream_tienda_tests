@@ -560,7 +560,11 @@ Fabricante: Xiaomi
 	@Test
 	void test29() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		var fab = listFabs.stream()
+                .filter(x->x.getProductos().size()==0)
+                .map(x->x.getNombre())
+                .toList();
+        fab.forEach(x->System.out.println(x));
 	}
 	
 	/**
@@ -569,7 +573,10 @@ Fabricante: Xiaomi
 	@Test
 	void test30() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+        var cantProd = listProds.stream()
+                .count();
+        System.out.println("Hay "+cantProd+" productos");
 	}
 
 	
@@ -579,7 +586,10 @@ Fabricante: Xiaomi
 	@Test
 	void test31() {
 		var listProds = prodRepo.findAll();
-		//TODO
+		var cantFab =  listProds.stream()
+                .filter(x->x.getFabricante().getProductos().size()>0)
+                .count();
+        System.out.println("Hay "+cantFab+" fabricantes con productos");
 	}
 	
 	/**
