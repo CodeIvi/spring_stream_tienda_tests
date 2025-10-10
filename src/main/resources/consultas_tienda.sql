@@ -71,26 +71,102 @@
 
 -- 23. Devuelve una lista con el nombre del producto, precio y nombre de fabricante de todos los productos de la base de datos. Ordene el resultado por el nombre del fabricante, por orden alfabético.
     Select p.nombre,p.precio,f.nombre from producto p inner join fabricante f on p.codigo_fabricante = f.codigo order by f.nombre;
+
 -- 24. Devuelve el nombre del producto, su precio y el nombre de su fabricante, del producto más caro.
     SELECT p.nombre,p.precio,f.nombre from producto p inner join fabricante f on p.codigo_fabricante = f.codigo
     order by p.precio DESC limit 1;
 
 -- 25. Devuelve una lista de todos los productos del fabricante Crucial que tengan un precio mayor que 200€.
+    USE tienda;
+    SELECT p.nombre, p.precio from producto p
+    inner join fabricante f
+    on p.codigo_fabricante = f.codigo
+    where p.precio > 200;
+
 -- 26. Devuelve un listado con todos los productos de los fabricantes Asus, Hewlett-Packard y Seagate.
+         SELECT p.nombre from producto p
+        inner join fabricante f
+        on p.codigo_fabricante = f.codigo
+        where f.nombre = 'Asus' or f.nombre = 'Hewlett-Packard' or f.nombre = 'Seagate';
+
 -- 27. Devuelve un listado con el nombre de producto, precio y nombre de fabricante, de todos los productos que tengan un precio mayor o igual a 180€. Ordene el resultado en primer lugar por el precio (en orden descendente) y en segundo lugar por el nombre.
--- 28. Devuelve un listado de los nombres fabricantes que existen en la base de datos, junto con los nombres productos que tiene cada uno de ellos. El listado deberá mostrar también aquellos fabricantes que no tienen productos asociados.
+    Select p.nombre,p.precio,f.nombre from producto p
+    inner join fabricante f
+    where p.precio > 180
+    order by p.precio DESC, f.nombre ASC
+
+
+-- 28. Devuelve un listado de los nombres fabricantes que existen en la base de datos, junto con los nombres productos que tiene cada uno de ellos.
+--    El listado deberá mostrar también aquellos fabricantes que no tienen productos asociados.
+    Select f.nombre As nombre_fabricante, p.nombre As nombre_producto from fabricante f
+    left join producto p
+    on f.codigo = p.codigo_fabricante;
+
 -- 29. Devuelve un listado donde sólo aparezcan aquellos fabricantes que no tienen ningún producto asociado.
+    Select f.nombre from fabricante f
+    left join producto p
+    on p.codigo_fabricante = f.codigo
+    where p.codigo_fabricante is null
+    order by f.nombre;
+
 -- 30. Calcula el número total de productos que hay en la tabla productos. Utiliza la api de stream.
+        Select count(p.nombre) AS cantidad_productos from producto p;
+
 -- 31. Calcula el número de fabricantes con productos, utilizando un stream de Productos.
+        Select count(DISTINCT f.codigo ) AS fabricante_con_productos from producto p
+        inner join fabricante f
+        on f.codigo = p.codigo_fabricante
+
+
+
 -- 32. Calcula la media del precio de todos los productos
+    Select AVG(precio) from producto;
+
 -- 33. Calcula el precio más barato de todos los productos. No se puede utilizar ordenación de stream.
+        SELECT min(precio) from producto;
+
 -- 34. Calcula la suma de los precios de todos los productos.
+        select sum(precio) from producto;
+
 -- 35. Calcula el número de productos que tiene el fabricante Asus.
+        Select count(p.nombre) from producto p
+        inner join fabricante f
+        where f.codigo = p.codigo_fabricante and f.nombre = 'Asus';
+
 -- 36. Calcula la media del precio de todos los productos del fabricante Asus.
--- 37. Muestra el precio máximo, precio mínimo, precio medio y el número total de productos que tiene el fabricante Crucial. Realízalo en 1 solo stream principal. Utiliza reduce con Double[] como "acumulador".
--- 38. Muestra el número total de productos que tiene cada uno de los fabricantes. El listado también debe incluir los fabricantes que no tienen ningún producto. El resultado mostrará dos columnas, una con el nombre del fabricante y otra con el número de productos que tiene. Ordene el resultado descendentemente por el número de productos.
--- 39. Muestra el precio máximo, precio mínimo y precio medio de los productos de cada uno de los fabricantes. El resultado mostrará el nombre del fabricante junto con los datos que se solicitan. Realízalo en 1 solo stream principal. Utiliza reduce con Double[] como "acumulador".
--- 40. Muestra el precio máximo, precio mínimo, precio medio y el número total de productos de los fabricantes que tienen un precio medio superior a 200€. No es necesario mostrar el nombre del fabricante, con el código del fabricante es suficiente.
+        Select AVG(p.precio) from producto p
+        inner join fabricante f
+        on p.codigo_fabricante = f.codigo and f.nombre = 'Asus';
+
+-- 37. Muestra el precio máximo, precio mínimo, precio medio y el número total de productos que tiene el fabricante Crucial.
+-- Realízalo en 1 solo stream principal. Utiliza reduce con Double[] como "acumulador".
+    Select max(p.precio) AS precio_máximo,min(p.precio) AS precio_minimo, AVG(p.precio) AS media,count(p.nombre) AS total_de_productos from producto p
+    inner join fabricante f
+    on p.codigo_fabricante = f.codigo and f.nombre = 'Crucial';
+
+-- 38. Muestra el número total de productos que tiene cada uno de los fabricantes. El listado también debe incluir los fabricantes que no tienen
+-- ningún producto. El resultado mostrará dos columnas, una con el nombre del fabricante y otra con el número de productos que tiene. Ordene el resultado
+-- descendentemente por el número de productos.
+    Select f.nombre AS nombre_del_fabricante, count(p.nombre) AS numero_de_productos from fabricante f
+    left join producto p
+    on p.codigo_fabricante = f.codigo
+    group by nombre_del_fabricante
+    order by numero_de_productos DESC ;
+
+-- 39. Muestra el precio máximo, precio mínimo y precio medio de los productos de cada uno de los fabricantes.
+--     El resultado mostrará el nombre del fabricante junto con los datos que se solicitan. Realízalo en 1 solo stream principal.
+--     Utiliza reduce con Double[] como "acumulador".
+
+        Select f.nombre AS nombre_fabricante, max(p.precio) AS precio_maximo,min(p.precio) AS precio_minimo ,avg(p.precio) AS media from producto p
+        inner join fabricante f
+        on p.codigo_fabricante = f.codigo
+        group by f.nombre;
+
+-- 40. Muestra el precio máximo, precio mínimo, precio medio y el número total de productos de los fabricantes que tienen un precio medio superior a 200€.
+-- No es necesario mostrar el nombre del fabricante, con el código del fabricante es suficiente.
+    Select p.codigo_fabricante AS codigo_fab,max(p.precio) AS precio_maximo, min(p.precio) AS precio_minimo, AVG(p.precio) AS media,count(p.nombre) AS total_productos from producto p
+    group by p.codigo_fabricante
+    having avg(p.precio)>200;
 -- 41. Devuelve un listado con los nombres de los fabricantes que tienen 2 o más productos.
 -- 42. Devuelve un listado con los nombres de los fabricantes y el número de productos que tiene cada uno con un precio superior o igual a 220 €. Ordenado de mayor a menor número de productos.
 -- 43. Devuelve un listado con los nombres de los fabricantes donde la suma del precio de todos sus productos es superior a 1000 €

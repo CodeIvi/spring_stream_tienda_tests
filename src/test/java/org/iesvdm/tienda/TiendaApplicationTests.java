@@ -606,7 +606,7 @@ Fabricante: Xiaomi
                 .mapToDouble(x->x.getPrecio())
                 .average();
         System.out.println(media);
-        Assertions.assertEquals(2988.96,media);
+        Assertions.assertEquals("OptionalDouble[271.7236363636364]",media);
 	}
 	
 	/**
@@ -628,8 +628,14 @@ Fabricante: Xiaomi
 	@Test
 	void test34() {
 		var listProds = prodRepo.findAll();
-        var
-	}
+
+        double sum =  listProds.stream()
+                .mapToDouble(x->x.getPrecio())
+                .sum();
+        System.out.println(sum);
+
+        Assertions.assertEquals(2988.96,sum);
+    }
 	
 	/**
 	 * 35. Calcula el número de productos que tiene el fabricante Asus.
@@ -637,7 +643,13 @@ Fabricante: Xiaomi
 	@Test
 	void test35() {
 		var listProds = prodRepo.findAll();
-		//TODO		
+
+        var numProdAsus = listProds.stream()
+                .filter(x->x.getFabricante().getCodigo() == 1)
+                .count();
+        System.out.println(numProdAsus);
+
+        Assertions.assertEquals(2,numProdAsus);
 	}
 	
 	/**
@@ -646,7 +658,13 @@ Fabricante: Xiaomi
 	@Test
 	void test36() {
 		var listProds = prodRepo.findAll();
-		//TODO
+
+        var precioAsus = listProds.stream()
+                .filter(x->x.getFabricante().getCodigo() == 1)
+                .filter(x->x.getFabricante().getNombre().equalsIgnoreCase("Asus"))
+                .mapToDouble(x->x.getPrecio())
+                .average();
+        System.out.println(precioAsus);
 	}
 	
 	
@@ -719,8 +737,18 @@ Hewlett-Packard              2
 	@Test
 	void test38() {
 		var listFabs = fabRepo.findAll();
-		//TODO
-	}
+        System.out.println("Fabricante      #Productos");
+        System.out.println("-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+
+        listFabs.stream()
+                .sorted(comparing(x->x.getProductos().size(),reverseOrder()))
+                .forEach(x->{
+                        String nombre =  x.getNombre();
+                        int numProductos = x.getProductos().size();
+                        String linea = String.format("%-15s %10d", nombre, numProductos);
+                        System.out.println(linea);
+                });
+    }
 	
 	/**
 	 * 39. Muestra el precio máximo, precio mínimo y precio medio de los productos de cada uno de los fabricantes. 
@@ -730,7 +758,48 @@ Hewlett-Packard              2
 	@Test
 	void test39() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+
+        listFabs.stream()
+                .forEach(fab->{
+
+                    var productos = fab.getProductos();
+
+                    Double[] stats = productos.stream()
+                            .map(p->p.getPrecio())
+                            .reduce(
+                                    new Double[]{0.0,Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY,0.0},
+                                    (acum,precio)->{
+                                        acum[0]+= precio;
+                                        acum[1] = Math.max(acum[1],precio);
+                                        acum[2] = Math.min(acum[2],precio);
+                                        acum[3] += 1;
+                                        return acum;
+                                    },
+                                    (a1,a2)->new Double[]{
+                                            a1[0]+a2[0],
+                                            Math.max(a1[1],a2[1]),
+                                            Math.min(a1[2],a2[2]),
+                                            a1[3] + a2 [3]
+                                    }
+                            );
+                    double suma = stats[0];
+                    double max = stats[1];
+                    double min = stats[2];
+                    double cantidad = stats[3];
+                    double media = cantidad > 0 ? suma / cantidad :0.0;
+
+                    String salida = String.format(
+                            "%-20s  Min: %8.2f | Max: %8.2f | Media: %8.2f",
+                            fab.getNombre(),
+                            cantidad > 0 ? min : 0.0,
+                            cantidad > 0 ? max : 0.0,
+                            media
+                    );
+                    System.out.println(salida);
+                });
+
+
+
 	}
 	
 	/**
@@ -740,8 +809,47 @@ Hewlett-Packard              2
 	@Test
 	void test40() {
 		var listFabs = fabRepo.findAll();
-		//TODO
-	}
+
+        listFabs.stream()
+                .forEach(fab->{
+                    var productos = fab.getProductos();
+
+                    var stats = productos.stream()
+                            .map(p->p.getPrecio())
+                            .reduce(
+                                  new Double[]{Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY,0.0,0.0},
+                                    (acum,precio)->{
+                                      acum[0] = Math.max(acum[0],precio);
+                                      acum[1] = Math.min(acum[1],precio);
+                                      acum[2] += 1;
+                                      acum[3] += precio;
+                                      return acum;
+                                      },
+                                    (a1,a2)->new Double[]{
+                                            Math.max(a1[0],a2[0]),
+                                            Math.min(a1[1],a2[1]),
+                                            a1[2] + a2 [2]
+                                    }
+
+                            );
+                    double max = stats[0];
+                    double min = stats[1];
+                    double media = stats[3]>0 ? stats[3]/stats[2] : 0.0;
+                    String salida ="";
+                    if(media > 200) {
+                        salida =String.format(
+                                "%-2s  MAX: %5.2f | Min: %5.2f | Media: 5.2f",
+                                fab.getCodigo(),
+                                min,
+                                max);
+                        System.out.println(salida);
+                    }
+
+
+                });
+
+    }
+
 	
 	/**
 	 * 41. Devuelve un listado con los nombres de los fabricantes que tienen 2 o más productos.
