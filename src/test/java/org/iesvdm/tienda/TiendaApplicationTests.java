@@ -857,7 +857,13 @@ Hewlett-Packard              2
 	@Test
 	void test41() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+
+        var lista = listFabs.stream()
+                .filter(x->x.getProductos().size()>=2)
+                .map(x->"Nombre: "+x.getNombre()+" cantidad de productos: "+x.getProductos().size())
+                .toList();
+        lista.forEach(x-> System.out.println(x));
+
 	}
 	
 	/**
@@ -867,7 +873,16 @@ Hewlett-Packard              2
 	@Test
 	void test42() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+
+        listFabs.stream()
+                .forEach(x->{
+                    var productos = x.getProductos();
+                    var cantidad = productos.stream()
+                            .filter(prod->prod.getPrecio()>=220)
+                            .count();
+                });
+
+
 	}
 	
 	/**
