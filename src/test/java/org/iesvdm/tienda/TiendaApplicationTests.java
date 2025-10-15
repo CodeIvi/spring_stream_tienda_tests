@@ -1039,15 +1039,15 @@ Hewlett-Packard              2
 		var listFabs = fabRepo.findAll();
         record lista(String fabricante, List<Producto> productos){}
         var resultado = listFabs.stream()
-                .map(f->{
-                   double media = f.getProductos().stream().mapToDouble(p->p.getPrecio()).average().orElse(0.0);
+                .map(f-> {
+                    double media = f.getProductos().stream().mapToDouble(p -> p.getPrecio()).average().orElse(0.0);
 
-                   List<Producto> productosFiltrados = f.getProductos().stream()
-                           .filter(x->x.getPrecio()>= media)
-                           .sorted(comparing(x->x.getPrecio(),reverseOrder()))
-                           .toList();
-                   return new lista(f.getNombre(),productosFiltrados);
-        })
+                    List<Producto> productosFiltrados = f.getProductos().stream()
+                            .filter(x -> x.getPrecio() >= media)
+                            .sorted(comparing(x -> x.getPrecio(), reverseOrder()))
+                            .toList();
+                    return new lista(f.getNombre(), productosFiltrados);
+                })
                 .sorted(comparing(lista -> lista.fabricante))
                 .toList();
         resultado.forEach(lista -> {
