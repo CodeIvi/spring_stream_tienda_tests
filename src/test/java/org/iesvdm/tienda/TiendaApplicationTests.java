@@ -19,6 +19,7 @@ import static java.util.Comparator.*;
 
 import java.sql.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -964,6 +965,7 @@ Hewlett-Packard              2
         listadoNombre3.forEach(s-> System.out.println(s));
 
 
+
 	}
 	
 	/**
@@ -1161,6 +1163,14 @@ Hewlett-Packard              2
                 .peek(value->System.out.println(value))
                 .reduce(0,(a,b)->a+b);
         System.out.println(sumTotal);
+
+    }
+
+    @Test
+    void testJoining(){
+      String hola =  Stream.of("Hola","mundo")
+                .collect(Collectors.joining(",",">","!"));
+      System.out.println(hola);
 
     }
 
