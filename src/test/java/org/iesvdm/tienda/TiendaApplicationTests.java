@@ -1,5 +1,6 @@
 package org.iesvdm.tienda;
 
+import lombok.extern.slf4j.Slf4j;
 import org.iesvdm.tienda.modelo.Fabricante;
 import org.iesvdm.tienda.modelo.Producto;
 import org.iesvdm.tienda.repository.FabricanteRepository;
@@ -21,6 +22,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 
+@Slf4j
 @SpringBootTest
 class TiendaApplicationTests {
 
@@ -158,8 +160,12 @@ class TiendaApplicationTests {
                                 comparing((Fabricante fabricante)->fabricante.getNombre(),reverseOrder())
                                         .thenComparing((Fabricante fabricante)-> fabricante.getCodigo(),reverseOrder())
                         ).toList();
+        listNoms3.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(9, listNoms.size());
 
 	}
+
 	
 	/**
 	 * 7. Lista los nombres de los productos ordenados en primer lugar por el nombre de forma ascendente y en segundo lugar por el precio de forma descendente.
@@ -192,6 +198,8 @@ class TiendaApplicationTests {
 					.map(x->"Nombre: "+ x.getNombre())
 					.toList();
 		cinco.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(5,cinco.size());
 	}
 		
 	
@@ -207,6 +215,8 @@ class TiendaApplicationTests {
 					.limit(2)
 					.toList();
 		dosFab.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(2,dosFab.size());
 	}
 	
 	/**
@@ -222,7 +232,12 @@ class TiendaApplicationTests {
 						.map(x->"Nombre: "+x.getNombre()+" "+x.getPrecio())
 						.limit(1)
 						.toList();
-		masBarato.forEach(x->System.out.println(x));
+		String resultado = masBarato.get(0);
+        System.out.println(resultado);
+
+        Assertions.assertEquals("Nombre: Impresora HP Deskjet 3720 59.99",resultado);
+
+
 						
 	}
 	
@@ -232,13 +247,16 @@ class TiendaApplicationTests {
 	@Test
 	void test11() {
 		var listProds = prodRepo.findAll();
-		var masBarato = listProds.stream()
+		var masCaro = listProds.stream()
 						.sorted(comparing((Producto producto)->producto.getPrecio(),reverseOrder())
 						)
 						.map(x->"Nombre: "+x.getNombre()+" "+x.getPrecio())
 						.limit(1)
 						.toList();
-		masBarato.forEach(x->System.out.println(x));
+
+        String resultado = masCaro.get(0);
+        System.out.println(resultado);
+        Assertions.assertEquals("Nombre: GeForce GTX 1080 Xtreme 755.0",resultado);
 						
 	}
 
@@ -255,6 +273,8 @@ class TiendaApplicationTests {
 					.map(x->"Nombre: "+x.getNombre())
 					.toList();
 		nomPro.forEach(x->System.out.println(x));
+        Assertions.assertEquals(2,nomPro.size());
+
 	}
 	
 	/**
@@ -269,6 +289,7 @@ class TiendaApplicationTests {
 							.map(x->"Nombre: "+x.getNombre()+" "+x.getPrecio())
 							.toList();
 		precioMenor.forEach(x->System.out.println(x));
+        Assertions.assertEquals(3,precioMenor.size());
 	}
 	
 	/**
@@ -283,6 +304,7 @@ class TiendaApplicationTests {
 							.map(x->"Nombre: "+x.getNombre()+" "+x.getPrecio())
 							.toList();
 		precioMayor.forEach(x->System.out.println(x));
+        Assertions.assertEquals(3,precioMayor.size());
 	}
 	
 	
@@ -299,6 +321,7 @@ class TiendaApplicationTests {
 							.map(x->"Nombre: "+x.getNombre()+" "+x.getPrecio())
 							.toList();
 		precioEntre.forEach(x->System.out.println(x));
+        Assertions.assertEquals(7,precioEntre.size());
 	}
 	
 	/**
@@ -312,6 +335,7 @@ class TiendaApplicationTests {
 							.map(x->"Nombre: "+x.getNombre()+" "+x.getPrecio())
 							.toList();
 		precioCod.forEach(x->System.out.println(x));
+        Assertions.assertTrue(precioCod.get(0).equals("Nombre: GeForce GTX 1080 Xtreme 755.0"));
 	}
 	
 	/**
@@ -330,6 +354,8 @@ class TiendaApplicationTests {
                                 .toList();
         filtrados.forEach(x->System.out.println(x));
 
+        Assertions.assertEquals(5,filtrados.size());
+        Assertions.assertTrue(filtrados.get(1).contains("Producto: Monitor 24 LED Full HD"));
 	}
 	
 	/**
@@ -343,6 +369,8 @@ class TiendaApplicationTests {
                 .map(x->"Nombre: "+x.getNombre()+ " "+"Precio: "+(x.getPrecio()*100) + " Céntimos")
                 .toList();
         ProdCent.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(11,ProdCent.size());
 
 	}
 	
@@ -359,6 +387,9 @@ class TiendaApplicationTests {
                 .map(x->"Nombre: "+x.getNombre())
                 .toList();
         nombS.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(2,nombS.size());
+        Assertions.assertTrue(nombS.get(0).contains("Nombre: Samsung"));
 	}
 	
 	/**
@@ -373,6 +404,9 @@ class TiendaApplicationTests {
                 .map(x -> "Nombre: " + x.getNombre())
                 .toList();
         cadPortatil.forEach(x -> System.out.println(x));
+
+        Assertions.assertEquals(2,cadPortatil.size());
+        Assertions.assertTrue(cadPortatil.get(0).contains("Nombre: Portátil Yoga 520"));
     }
 	/**
 	 * 21. Devuelve una lista con el nombre de todos los productos que contienen la cadena Monitor en el nombre y tienen un precio inferior a 215 €.
@@ -385,6 +419,7 @@ class TiendaApplicationTests {
                 .map(x->"Nombre: "+x.getNombre())
                 .toList();
         monPre.forEach(x->System.out.println(x));
+        Assertions.assertTrue(monPre.contains("Nombre: Monitor 24 LED Full HDv"));
 	}
 	
 	/**
@@ -402,6 +437,8 @@ class TiendaApplicationTests {
                 .map(x->"Nombre: "+x.getNombre())
                 .toList();
         nomPre.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(7,nomPre.size());
     }
 	
 	/**
@@ -418,6 +455,7 @@ class TiendaApplicationTests {
 
                 .toList();
         list.forEach(x->System.out.println(x));
+        Assertions.assertEquals(11,list.size());
 	}
 	
 	/**
@@ -430,9 +468,12 @@ class TiendaApplicationTests {
         var prodCaro = listProds.stream()
                 .sorted(comparing(producto -> producto.getPrecio(),reverseOrder()))
                 .limit(1)
-                .map(x->"Nombre: "+x.getNombre()+" "+"Precio: "+x.getPrecio()+" "+"Fabricante: "+ x.getFabricante().getNombre());
+                .map(x->"Nombre: "+x.getNombre()+" "+"Precio: "+x.getPrecio()+" "+"Fabricante: "+ x.getFabricante().getNombre())
+                .toList();
 
         prodCaro.forEach(x->System.out.println(x));
+
+        Assertions.assertTrue(prodCaro.get(0).contains("Nombre: GeForce GTX 1080 Xtreme Precio: 755.0 Fabricante: Crucial"));
     }
 	
 	/**
@@ -465,6 +506,8 @@ class TiendaApplicationTests {
                 .map(x->"Nombre: "+x.getNombre()+" "+"Fabricante: "+x.getFabricante().getNombre())
                 .toList();
         filtrar.forEach(x->System.out.println(x));
+
+        Assertions.assertEquals(5,filtrar.size());
     }
 	
 	/**
@@ -493,6 +536,7 @@ Monitor 27 LED Full HD |199.25190000000003|Asus
                 .map(x->x.getNombre() + "|" + x.getPrecio() + "|" + x.getFabricante().getNombre())
                 .toList();
         list.forEach(s->System.out.println(s));
+        Assertions.assertEquals(7,list.size());
 
 	}
 	
@@ -567,6 +611,7 @@ Fabricante: Xiaomi
                 .map(x->x.getNombre())
                 .toList();
         fab.forEach(x->System.out.println(x));
+        Assertions.assertEquals(2,fab.size());
 	}
 	
 	/**
@@ -579,6 +624,8 @@ Fabricante: Xiaomi
         var cantProd = listProds.stream()
                 .count();
         System.out.println("Hay "+cantProd+" productos");
+
+        Assertions.assertTrue(cantProd == 11);
 	}
 
 	
@@ -665,6 +712,8 @@ Fabricante: Xiaomi
                 .mapToDouble(x->x.getPrecio())
                 .average();
         System.out.println(precioAsus);
+
+
 	}
 	
 	
@@ -712,6 +761,8 @@ Fabricante: Xiaomi
         });
 
         System.out.println(Arrays.toString(reduced));
+
+        Assertions.assertTrue(reduced[1]==755.0);
 	}
 	
 	/**
@@ -748,6 +799,7 @@ Hewlett-Packard              2
                         String linea = String.format("%-15s %10d", nombre, numProductos);
                         System.out.println(linea);
                 });
+        Assertions.assertEquals(9,listFabs.size());
     }
 	
 	/**
@@ -798,6 +850,8 @@ Hewlett-Packard              2
                     System.out.println(salida);
                 });
 
+        Assertions.assertEquals(9,listFabs.size());
+
 
 
 	}
@@ -835,18 +889,23 @@ Hewlett-Packard              2
                     double max = stats[0];
                     double min = stats[1];
                     double media = stats[3]>0 ? stats[3]/stats[2] : 0.0;
+                    double cantidad = stats[3];
                     String salida ="";
                     if(media > 200) {
                         salida =String.format(
-                                "%-2s  MAX: %5.2f | Min: %5.2f | Media: 5.2f",
+                                "%-2s  MAX: %5.2f | Min: %5.2f | Media: 5.2f | Cantidad: %5.2f",
                                 fab.getCodigo(),
                                 min,
-                                max);
+                                max,
+                                media,
+                                cantidad
+                                );
                         System.out.println(salida);
                     }
 
 
                 });
+        Assertions.assertEquals(3,listFabs.size());
 
     }
 
@@ -864,6 +923,8 @@ Hewlett-Packard              2
                 .toList();
         lista.forEach(x-> System.out.println(x));
 
+        Assertions.assertEquals(4,lista.size());
+
 	}
 	
 	/**
@@ -874,13 +935,32 @@ Hewlett-Packard              2
 	void test42() {
 		var listFabs = fabRepo.findAll();
 
-        listFabs.stream()
-                .forEach(x->{
-                    var productos = x.getProductos();
-                    var cantidad = productos.stream()
-                            .filter(prod->prod.getPrecio()>=220)
-                            .count();
-                });
+        //mediante Object[]
+        var listadoNombre = listFabs.stream()
+                .map(f->new Object[]{
+                        f.getNombre(),
+                        f.getProductos()
+                                .stream()
+                                .filter(p->p.getPrecio()>200)
+                                .count()
+                })
+                .sorted(comparing((a)->(Long) a[1],reverseOrder()))
+                .toList();
+
+        //Con record
+        record NomFabConteoProds(String nomFab, long contProds){}
+        var listadoNombre3 = listFabs.stream()
+                .map(f->new NomFabConteoProds(
+                        f.getNombre(),
+                        f.getProductos()
+                                .stream()
+                                .filter(p->p.getPrecio()>200)
+                                .count())
+                )
+                .sorted(comparing((a)->a.contProds(),reverseOrder()))
+                .toList();
+
+        listadoNombre3.forEach(s-> System.out.println(s));
 
 
 	}
