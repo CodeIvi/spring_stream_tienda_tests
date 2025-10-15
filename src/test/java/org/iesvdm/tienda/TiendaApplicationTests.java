@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import static java.util.Comparator.*;
 
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -971,7 +972,17 @@ Hewlett-Packard              2
 	@Test
 	void test43() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		var nombres = listFabs.stream()
+                .filter(f->f.getProductos()
+                        .stream()
+                        .mapToDouble(x->x.getPrecio())
+                        .sum()>1000)
+                .map(f->"Nombre: " + f.getNombre())
+                .toList();
+
+        nombres.forEach(s-> System.out.println(s));
+        Assertions.assertTrue(nombres.get(0).equals("Nombre: Lenovo"));
+
 	}
 	
 	/**
@@ -981,7 +992,14 @@ Hewlett-Packard              2
 	@Test
 	void test44() {
 		var listFabs = fabRepo.findAll();
-		//TODO	
+		var fab = listFabs.stream()
+                .filter(x->x.getProductos()
+                        .stream()
+                        .mapToDouble(f->f.getPrecio())
+                        .sum()>1000)
+                .sorted(comparing(x->x.getProductos().stream().mapToDouble(p->p.getPrecio()).sum()))
+                .toList();
+        fab.forEach(x-> System.out.println(x));
 	}
 	
 	/**
@@ -992,7 +1010,24 @@ Hewlett-Packard              2
 	@Test
 	void test45() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+		record productoMasCaro(String producto,double precio, String fabricante){}
+
+       var lista = listFabs.stream()
+                .map( f-> {
+                    var productosMasCaros = f.getProductos().stream()
+                            .max(comparing(x->x.getPrecio()))
+                            .orElse(null);
+                    return new productoMasCaro(
+                            productosMasCaros != null ? productosMasCaros.getNombre() : "Sin productos",
+                            productosMasCaros != null ? productosMasCaros.getPrecio() : 0.0,
+                            f.getNombre()
+                    );
+                })
+                .sorted(comparing(productoMasCaro -> productoMasCaro.fabricante))
+                .toList();
+        lista.forEach(x-> System.out.println(x));
+
+        Assertions.assertEquals(9,lista.size());
 	}
 	
 	/**
@@ -1002,7 +1037,23 @@ Hewlett-Packard              2
 	@Test
 	void test46() {
 		var listFabs = fabRepo.findAll();
-		//TODO
+        record lista(String fabricante, List<Producto> productos){}
+        var resultado = listFabs.stream()
+                .map(f->{
+                   double media = f.getProductos().stream().mapToDouble(p->p.getPrecio()).average().orElse(0.0);
+
+                   List<Producto> productosFiltrados = f.getProductos().stream()
+                           .filter(x->x.getPrecio()>= media)
+                           .sorted(comparing(x->x.getPrecio(),reverseOrder()))
+                           .toList();
+                   return new lista(f.getNombre(),productosFiltrados);
+        })
+                .sorted(comparing(lista -> lista.fabricante))
+                .toList();
+        resultado.forEach(lista -> {
+            System.out.println("Fabricante: " + lista.fabricante());
+            lista.productos.forEach(producto -> System.out.println("Nombre: " + producto.getNombre() + " Precio: " + producto.getPrecio()));
+        });
 	}
     @Test
     void testFlatmapPrevio() {
