@@ -1012,16 +1012,15 @@ Hewlett-Packard              2
 	@Test
 	void test45() {
 		var listFabs = fabRepo.findAll();
-		record productoMasCaro(String producto,double precio, String fabricante){}
+		record ProductoMasCaro(String producto,double precio, String fabricante){}
 
        var lista = listFabs.stream()
                 .map( f-> {
                     var productosMasCaros = f.getProductos().stream()
-                            .max(comparing(x->x.getPrecio()))
-                            .orElse(null);
-                    return new productoMasCaro(
-                            productosMasCaros != null ? productosMasCaros.getNombre() : "Sin productos",
-                            productosMasCaros != null ? productosMasCaros.getPrecio() : 0.0,
+                            .max(comparing(x->x.getPrecio()));
+                    return new ProductoMasCaro(
+                            productosMasCaros != null ? productosMasCaros.get().getNombre() : "Sin productos",
+                            productosMasCaros != null ? productosMasCaros.get().getPrecio() : 0.0,
                             f.getNombre()
                     );
                 })
@@ -1171,6 +1170,29 @@ Hewlett-Packard              2
       String hola =  Stream.of("Hola","mundo")
                 .collect(Collectors.joining(",",">","!"));
       System.out.println(hola);
+
+    }
+
+    /**
+     * 46. Devuelve un listado de todos los productos que tienen un precio mayor o igual a la media de todos los productos de su mismo fabricante.
+     * Se ordenará por fabricante en orden alfabético ascendente y los productos de cada fabricante tendrán que estar ordenados por precio descendente.
+     */
+    @Test
+    void test47() {
+        var listFabs = fabRepo.findAll();
+
+        record lista(String fabricante,List<Producto> productos){}
+
+        listFabs.stream()
+                .map(fab->{
+                    double media = fab.getProductos().stream().mapToDouble(x->x.getPrecio()).average().orElse(0.0);
+
+                    List <Producto> listaProductos = fab.getProductos().stream()
+                            .filter(x->x.getPrecio() >= media)
+                            .toList();
+
+                    return new lista()
+                })
 
     }
 
